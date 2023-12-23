@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 
 class TestView(
@@ -13,6 +14,10 @@ class TestView(
 ) : View(context, attributeSet) {
     private val paint = Paint()
     private val paintC = Paint()
+    private val startAngle = -180f
+    private val colors = listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW)
+    private val sweepAngle = 360f / colors.size
+    private var buttonClicked = -1
 
     init {
         paint.style = Paint.Style.STROKE
@@ -24,7 +29,58 @@ class TestView(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), 100f, paintC)
+        drawCircleButton(canvas)
+    }
+
+    private fun drawCircleButton(canvas: Canvas) {
+        val centerX = width / 2f
+        val centerY = height / 2f
+        val radius = width.coerceAtMost(height) / 2f
+        for (i in colors.indices) {
+            paintC.color = if (i == buttonClicked)
+                Color.GRAY
+            else colors[i]
+            canvas.drawArc(
+                centerX - radius,
+                centerY - radius,
+                centerX + radius,
+                centerY + radius,
+                startAngle + i * sweepAngle,
+                sweepAngle,
+                true,
+                paintC
+            )
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val centerX = width / 2f
+        val centerY = height / 2f
+        val x = event.x
+        val y = event.y
+
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                if (x < centerX && y < centerY) {
+                    buttonClicked = 0
+                }
+                if (x > centerX && y < centerY) {
+                    buttonClicked = 1
+                }
+                if (x > centerX && y > centerY) {
+                    buttonClicked = 2
+                }
+                if (x < centerX && y > centerY) {
+                    buttonClicked = 3
+                }
+                invalidate()
+            }
+
+            MotionEvent.ACTION_UP -> {
+                buttonClicked = -1
+                invalidate()
+            }
+        }
+        return true
     }
 }
