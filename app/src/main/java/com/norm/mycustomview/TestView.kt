@@ -14,6 +14,7 @@ class TestView(
     context: Context,
     attributeSet: AttributeSet,
 ) : View(context, attributeSet) {
+    var listener: Listener? = null
     private val paint = Paint()
     private val paintC = Paint()
     private val startAngle = 0f
@@ -28,7 +29,7 @@ class TestView(
         Color.WHITE
     )
     private val sweepAngle = 360f / colors.size
-    private var buttonClicked = -1
+    private var buttonClicked = 0
 
     init {
         paint.style = Paint.Style.STROKE
@@ -62,6 +63,14 @@ class TestView(
                 paintC
             )
         }
+        //Setting the color of the central circle by pressing the button
+        paintC.color = colors[buttonClicked]
+        canvas.drawCircle(
+            centerX,
+            centerY,
+            radius / 3f,
+            paintC
+        )
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -79,15 +88,15 @@ class TestView(
                     ).toDouble()
                 ) + 360) % 360
                 buttonClicked = (angle / (360 / colors.size)).toInt()
+                listener?.onClick(buttonClicked)
                 Log.d("MyLog", "Angle: $angle")
-                invalidate()
-            }
-
-            MotionEvent.ACTION_UP -> {
-                buttonClicked = -1
                 invalidate()
             }
         }
         return true
+    }
+
+    interface Listener {
+        fun onClick(index: Int)
     }
 }
