@@ -6,10 +6,6 @@ import com.norm.mycustomview.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), TestView.Listener {
     private lateinit var binding: ActivityMainBinding
-    private val menuList = listOf(
-        "Edit", "Delete", "Remove", "Exit",
-        "Next", "Back", "Play", "Pause"
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +15,6 @@ class MainActivity : AppCompatActivity(), TestView.Listener {
     }
 
     override fun onClick(index: Int) {
-        binding.textView.text = menuList[index]
+        binding.textView.text = TextUtils.menuList[index]
     }
 }
