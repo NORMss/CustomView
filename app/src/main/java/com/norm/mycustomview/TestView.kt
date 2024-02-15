@@ -1,6 +1,7 @@
 package com.norm.mycustomview
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -21,8 +23,15 @@ class TestView(
     private val paintCWidth = 100f
     private val paintText = Paint()
     private val paint = Paint()
+    private val paintBm = Paint()
     private val paintC = Paint()
     private val startAngle = 0f
+
+    private var bm: Bitmap
+
+    private var mainColor1 = Color.BLUE
+    private var mainColor2 = Color.BLUE
+
     private val colors = listOf(
         Color.RED,
         Color.GREEN,
@@ -37,6 +46,19 @@ class TestView(
     private var buttonClicked = 0
 
     init {
+        val drawable = ContextCompat.getDrawable(context, R.drawable.baseline_settings_24)
+        bm = Bitmap.createBitmap(
+            128,
+            128,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bm)
+        drawable?.setBounds(0, 0, 128, 128)
+        drawable?.draw(canvas)
+
+        mainColor1 = ContextCompat.getColor(context, R.color.main_menu_color_1)
+        mainColor2 = ContextCompat.getColor(context, R.color.main_menu_color_2)
+
         paintText.style = Paint.Style.FILL
         paintText.color = Color.WHITE
         paintText.textSize = 36f
@@ -59,8 +81,8 @@ class TestView(
         paintC.style = Paint.Style.STROKE
         for (i in colors.indices) {
             paintC.color = if (i == buttonClicked)
-                Color.GRAY
-            else colors[i]
+                Color.BLACK
+            else mainColor1
             canvas.drawArc(
                 centerX - radius,
                 centerY - radius,
@@ -74,14 +96,21 @@ class TestView(
         }
         paintC.style = Paint.Style.FILL
         //Setting the color of the central circle by pressing the button
-        paintC.color = colors[buttonClicked]
+        paintC.color = mainColor2
         canvas.drawCircle(
             centerX,
             centerY,
-            radius / 3f,
+            radius / 1.5f,
             paintC
         )
         drawMenuText(canvas)
+
+        canvas.drawBitmap(
+            bm,
+            centerX - bm.width / 2f,
+            centerY - bm.height / 2f,
+            paintBm
+        )
     }
 
     private fun drawMenuText(canvas: Canvas) {
